@@ -41,18 +41,19 @@ module.exports = function(args, conn, bot, message) {
                     debug('afterPlaceSarch');
                     if (res.results.length == 0) {
                         bot.postMessage(message.channel, LunchMessage.NOT_FOUND, {icon_emoji:':disappointed:'});
-                        return false;
+                        return Promise.reject();
                     }
+                    else {
+                        lunch.name = res.results[0].name;
+                        lunch.location.lat = res.results[0].geometry.location.lat;
+                        lunch.location.lng = res.results[0].geometry.location.lng;
+                        lunch.place_id = res.results[0].place_id;
 
-                    lunch.name = res.results[0].name;
-                    lunch.location.lat = res.results[0].geometry.location.lat;
-                    lunch.location.lng = res.results[0].geometry.location.lng;
-                    lunch.place_id = res.results[0].place_id;
+                        let query = Lunch.findOne({name: lunch.name});
+                        query.select('name');
 
-                    let query = Lunch.findOne({name: lunch.name});
-                    query.select('name');
-
-                    return query.exec();
+                        return query.exec();
+                    }
                 })
                 .then(function(lunchFound) {
                     if(lunchFound != null && lunchFound.name == lunch.name) {
@@ -66,6 +67,13 @@ module.exports = function(args, conn, bot, message) {
                     lunch.url = res.result.url;
                     lunch.website = res.result.url;
                     lunch.phone = res.result.formatted_phone_number;
+
+                    return googleMapAPI.distanceMatrix(location, lunch.location.lat+','+lunch.location.lng);
+                })
+                .then(function(res) {
+                    console.log(res);
+                    lunch.distance = res.rows[0].elements[0].distance.value;
+                    lunch.duration = res.rows[0].elements[0].duration.value;
 
                     debug(lunch);
                     lunch.save(function(err, lunch) {
@@ -91,7 +99,7 @@ module.exports = function(args, conn, bot, message) {
                     lunchFound.remove(function(err) {
                         if(err) {
                             console.error(err);
-                            return false;
+                            return Promise.reject();
                         }
                     });
 
@@ -102,33 +110,48 @@ module.exports = function(args, conn, bot, message) {
             // Search
             let selected = null;
             Lunch.find().exec()
-                .then(function(lunches) {
-                    if(lunches == null) return false;
-                    let max = lunches.length;
+                .then(function(lunch) {
+                    if(lunch == null) return Promise.reject();
+                    let max = lunch.length;
                     let rand = Math.floor((Math.random() * max));
-                    selected = lunches[rand];
+                    selected = lunch[rand];
+                    console.log(selected);
                     debug('rand:',rand);
                     // debug(selected);
                     return googleMapAPI.placeDetail(selected.place_id);
                 })
                 .then(function(res) {
-                    let openStr = '';
+                    let infoStr = [];
                     if(typeof res.result.opening_hours.open_now != 'undefined') {
                         if(res.result.opening_hours.open_now == 'true') {
-                            openStr = '(営業中)';
+                            infoStr.push('営業中');
                         }
                         else {
-                            openStr = '(営業時間外)';
+                            infoStr.push('営業時間外');
                         }
                     }
-                    bot.postMessage(message.channel, LunchMessage.RESULT.replace('$name',selected.name)
-                        + openStr, 
+
+                    let distance = (Number(selected.distance) / 1000).toFixed(2) + ' km';
+                    let duration = (Number(selected.duration) / 60).toFixed(1) + ' 分';
+
+                    infoStr.push(distance);
+                    infoStr.push(duration);
+
+                    console.log(infoStr.join(' '));
+
+                    bot.postMessage(message.channel, LunchMessage.RESULT.replace('$name',selected.name), 
                         {
                             "icon_emoji": ':ok_hand:',
                             "attachments": [
-                                {"title": "GoogleMapで位置を確認する",
+                                {
+                                    "title": infoStr.join(' / '),
+                                    "color": "33fdd55"
+                                },
+                                {
+                                    "title": "GoogleMapで位置を確認する",
                                     "title_link": selected.url,
-                                    "color": "#ff1111"}
+                                    "color": "#dd3333"
+                                }
                             ]
                         });
                 });

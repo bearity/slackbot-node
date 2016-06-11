@@ -12,5 +12,7 @@ module.exports = new Schema({
     url: {type: String},
     website: {type: String},
     phone: {type: String},
-    tags: {type: String}
+    tags: {type: String},
+    distance: {type: Number},
+    duration: {type: Number} 
 });

@@ -59,22 +59,3 @@ extend(bot, botUtils);
 db.init();
 bot.init();
 console.log('[INIT] BOT');
-
-// SlackBot.prototype.getUserById = function(userid) {
-//     var _self = this;
-//     return new Promise(function(resolve, reject) {
-//         _self._api('users.info', {user: userid}).then(function(res) {
-//             resolve(res.user);
-//         });
-//     });
-// };
-
-// bot.on('start', function() {
-   
-// });
- // type: 'message',
- // channel: 'D0ATGKS8K',
- // user: 'U06S46EN7',
- // text: 'test',
- // ts: '1464597982.000009',
- // team: 'T03LGKPCJ' }
