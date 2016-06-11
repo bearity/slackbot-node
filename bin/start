@@ -1,0 +1,80 @@
+#!/usr/bin/env node
+"use strict";
+
+/**
+ * Module dependencies.
+ */
+
+const app = require('../app');
+const debug = require('debug')('slackbot-node:server');
+const SlackBot = require('slackbots');
+const Vow = require('vow');
+const appConf = require('../conf/app.conf');
+const extend = require('extend');
+const db = require('../lib/db.js');
+
+// console.log(appConf);
+let bot = new SlackBot({
+    token: appConf.SLACK_BOT_TOKEN,
+    name: 'lunchbot'
+});
+
+let botUtils = {
+    init: function() {
+        this.on('message', this._onMessage);
+    },
+    _onMessage: function(message) {
+        switch(message.type) {
+            case 'message':
+                if(this.isCommand(message.text)) {
+                    this._processMessage(message);
+                }
+                break;
+            default:
+        }
+    },
+    _processMessage: function(message) {
+        let args = this.parseCommand(message.text);
+        // Execute module if exists
+        try {
+            require('../modules/' + args[0])(args, db.getConnection(), bot, message);
+        }
+        catch(e) {
+            console.log(e.stack);
+            console.log('Module not found');
+        }
+    },
+    isCommand: function(text) {
+        return text.substr(0,1) == '!';
+    },
+    parseCommand: function(message) {
+        let args = message.split(' ');
+        args[0] = args[0].substring(1);
+        return args;
+    }
+};
+
+extend(bot, botUtils);
+
+db.init();
+bot.init();
+console.log('[INIT] BOT');
+
+// SlackBot.prototype.getUserById = function(userid) {
+//     var _self = this;
+//     return new Promise(function(resolve, reject) {
+//         _self._api('users.info', {user: userid}).then(function(res) {
+//             resolve(res.user);
+//         });
+//     });
+// };
+
+// bot.on('start', function() {
+   
+// });
+ // type: 'message',
+ // channel: 'D0ATGKS8K',
+ // user: 'U06S46EN7',
+ // text: 'test',
+ // ts: '1464597982.000009',
+ // team: 'T03LGKPCJ' }
