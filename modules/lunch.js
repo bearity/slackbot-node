@@ -122,8 +122,8 @@ module.exports = function(args, conn, bot, message) {
                 })
                 .then(function(res) {
                     let infoStr = [];
-                    if(typeof res.result.opening_hours.open_now != 'undefined') {
-                        if(res.result.opening_hours.open_now == 'true') {
+                    if(res.result.opening_hours != null && typeof res.result.opening_hours.open_now != 'undefined') {
+                        if(res.result.opening_hours.open_now == true) {
                             infoStr.push('営業中');
                         }
                         else {
@@ -138,6 +138,8 @@ module.exports = function(args, conn, bot, message) {
                     infoStr.push(duration);
 
                     console.log(infoStr.join(' '));
+
+
 
                     bot.postMessage(message.channel, LunchMessage.RESULT.replace('$name',selected.name), 
                         {
