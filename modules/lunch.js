@@ -2,7 +2,7 @@
 const LunchModel = require('../models/Lunch');
 const appConf = require('../conf/app.conf');
 const googleMapAPI = require('../lib/googleMap');
-const debug = require('debug')('slackbot-node:'+ require('path').basename(__filename));
+const debug = require('debug')('module:'+ require('path').basename(__filename));
 const mongoose = require('mongoose');
 const Lunch = mongoose.model('Lunch', LunchModel);
 

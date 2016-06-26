@@ -10,14 +10,14 @@ exports.help = '*HELP* ヘルプメッセージを表示します\r!help [コマ
 exports.func = function(args, conn, bot, message) {
     if(args.length == 1) {
         let moduleList = new Array();
-        fs.readdir('./modules', function(err, list) {
+        fs.readdir(require('path').dirname(__filename), function(err, list) {
             let commands = list.join(' ').replace(/\.js/g, '');
             bot.postMessage(message.channel, Messages.MODULE_LIST.replace('$commands', commands), {icon_emoji:':question:'});
         });
     }
     if(args.length == 2) {
         try {
-            let moduleHelp = require('../modules/'+ args[1]).help;
+            let moduleHelp = require(require('path').dirname(__filename) + '/' + args[1]).help;
             if(typeof moduleHelp != 'undefined' && moduleHelp != '') {
                 bot.postMessage(message.channel, moduleHelp, {icon_emoji:':question:'});
             }
