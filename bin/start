@@ -5,10 +5,8 @@
  * Module dependencies.
  */
 
-const app = require('../app');
 const debug = require('debug')('slackbot-node:server');
 const SlackBot = require('slackbots');
-const Vow = require('vow');
 const appConf = require('../conf/app.conf');
 const extend = require('extend');
 const db = require('../lib/db.js');
