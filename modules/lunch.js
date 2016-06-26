@@ -16,7 +16,9 @@ const LunchMessage = {
     RESULT: '抽選の結果は、「$name」です！'
 };
 
-module.exports = function(args, conn, bot, message) {
+exports.help = '*HELP* 登録されているリストからランダムでランチのお店を出します\r!lunch [add|remove] [追加・削除するお店の名前]\rGoogleMapで飲食店として検索できるものに限ります';
+
+exports.func = function(args, conn, bot, message) {
     let sub = args[1];
     args.splice(0,2);
     let arg = args.join(' ');
@@ -112,8 +114,9 @@ module.exports = function(args, conn, bot, message) {
             Lunch.find().exec()
                 .then(function(lunch) {
                     if(lunch == null) return Promise.reject();
+                    let min = 1;
                     let max = lunch.length;
-                    let rand = Math.floor((Math.random() * max));
+                    let rand = (Math.floor(Math.random() * (max - min)) + min) - 1;
                     selected = lunch[rand];
                     console.log(selected);
                     debug('rand:',rand);

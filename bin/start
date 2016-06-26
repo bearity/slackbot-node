@@ -37,7 +37,7 @@ let botUtils = {
         let args = this.parseCommand(message.text);
         // Execute module if exists
         try {
-            require('../modules/' + args[0])(args, db.getConnection(), bot, message);
+            require('../modules/' + args[0]).func(args, db.getConnection(), bot, message);
         }
         catch(e) {
             console.log(e.stack);
