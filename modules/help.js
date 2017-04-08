@@ -1,11 +1,11 @@
 const fs = require('fs');
 
 let Messages = {
-    MODULE_LIST: 'コマンド一覧: $commands',
-    NOT_FOUND: '該当モジュールが存在しないか、またはヘルプが設定されていません'
+    MODULE_LIST: 'Command list: $commands',
+    NOT_FOUND: 'Module not found, or module doesn\'t have help message.'
 }
 
-exports.help = '*HELP* ヘルプメッセージを表示します\r!help [コマンド]';
+exports.help = '*HELP* Display help message.\r!help [command]';
 
 exports.func = function(args, conn, bot, message) {
     if(args.length == 1) {
