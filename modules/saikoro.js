@@ -1,9 +1,9 @@
 "use strict";
 
-exports.help = '*HELP* サイコロを振ります\r!saikoro [サイコロの最大の目:デフォルトは6]';
+exports.help = '*HELP* Roll the dice.\r!dice [max:default 6]';
 
 exports.func = function(args, conn, bot, message) {
-    const SaikoroMessage = 'サイコロをふりました！結果は「$rand」です。';
+    const SaikoroMessage = 'Let\'s roll the dice! It\'s [$rand].';
     let min = 1;
     let max = 6;
     if(args.length == 2) {
